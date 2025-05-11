@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Dropbox Video Vorschau & Download</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+  <h1>🎬 Vorschau & Download</h1>
+
+  <div id="video-container">
+    <p>Kein Video-Link übergeben. Bitte verwende ?video= in der URL.</p>
+  </div>
+
+  <script>
+    function getParameter(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+
+    function isAndroid() {
+      return /Android/.test(navigator.userAgent);
+    }
+
+    const videoUrl = getParameter('video');
+    if (videoUrl) {
+      const safeUrl = decodeURIComponent(videoUrl);
+      const videoHTML = `
+        <video controls style="max-width: 90%; height: auto; margin-top: 20px;">
+          <source src="\${safeUrl}" type="video/mp4">
+          Dein Browser unterstützt kein eingebettetes Video.
+        </video>
+      `;
+
+      let actionButtonHTML = "";
+
+      if (isIOS() && navigator.share) {
+        // Teilen-Button für iOS mit native Share API
+        actionButtonHTML = `
+          <div style="margin-top: 30px;">
+            <button onclick="shareVideo()" style="font-size: 18px; padding: 10px 20px; background: #34c759; color: white; border: none; border-radius: 8px;">
+              📤 Teilen / In Dateien sichern
+            </button>
+          </div>
+        `;
+      } else {
+        // Download-Link für Android und Desktop
+        actionButtonHTML = `
+          <div style="margin-top: 30px;">
+            <a href="\${safeUrl}" download style="display: inline-block; font-size: 18px; padding: 10px 20px; background: #007aff; color: white; border-radius: 8px; text-decoration: none;">
+              📥 Herunterladen
+            </a>
+          </div>
+        `;
+      }
+
+      document.getElementById("video-container").innerHTML = videoHTML + actionButtonHTML;
+    }
+
+    function shareVideo() {
+      const videoUrl = getParameter('video');
+      if (navigator.share && videoUrl) {
+        navigator.share({
+          title: 'Video herunterladen',
+          text: 'Hier ist das Video-Link:',
+          url: decodeURIComponent(videoUrl)
+        }).catch((err) => {
+          console.error('Teilen fehlgeschlagen:', err);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
