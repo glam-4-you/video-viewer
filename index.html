@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamisches Dropbox-Video</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+  <h1>🎬 Vorschau & Download</h1>
+
+  <div id="video-container">
+    <p>Kein Video-Link übergeben. Bitte verwende ?video= in der URL.</p>
+  </div>
+
+  <script>
+    function getParameter(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    const videoUrl = getParameter('video');
+    if (videoUrl) {
+      const safeUrl = decodeURIComponent(videoUrl);
+      document.getElementById('video-container').innerHTML = `
+        <video controls style="max-width: 90%; height: auto; margin-top: 20px;">
+          <source src="${safeUrl}" type="video/mp4">
+          Dein Browser unterstützt kein eingebettetes Video.
+        </video>
+        <div style="margin-top: 30px;">
+          <a href="${safeUrl}" download style="display: inline-block; font-size: 18px; padding: 10px 20px; background: #007aff; color: white; border-radius: 8px; text-decoration: none;">
+            📥 Video herunterladen
+          </a>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
